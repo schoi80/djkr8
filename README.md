@@ -162,6 +162,10 @@ cd dj-playlist-optimizer
 # Install with dev dependencies
 uv sync --dev
 
+# Install pre-commit hooks
+uv run pre-commit install
+uv run pre-commit install --hook-type commit-msg
+
 # Run tests
 uv run pytest
 
@@ -170,8 +174,44 @@ uv run ruff check          # Check for issues
 uv run ruff check --fix    # Auto-fix issues
 uv run ruff format         # Format code
 
+# Run pre-commit on all files
+uv run pre-commit run --all-files
+
 # Run example
 uv run python examples/sdk_usage.py
+```
+
+### Commit Message Format
+
+This project enforces [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>: <description>
+
+[optional body]
+
+[optional footer]
+```
+
+**Allowed types:**
+- `feat` - New feature
+- `fix` - Bug fix
+- `docs` - Documentation changes
+- `style` - Code style changes (formatting, etc.)
+- `refactor` - Code refactoring
+- `perf` - Performance improvements
+- `test` - Test changes
+- `build` - Build system changes
+- `ci` - CI configuration changes
+- `chore` - Other changes (deps, etc.)
+- `revert` - Revert previous commit
+
+**Examples:**
+```bash
+git commit -m "feat: add halftime BPM matching"
+git commit -m "fix: correct Camelot wheel compatibility check"
+git commit -m "docs: update README with logging examples"
+git commit -m "refactor: simplify return statements in bpm.py"
 ```
 
 ## How the Solver Works
