@@ -1,9 +1,13 @@
-"""Rekordbox 6 database loader."""
+"""Rekordbox 6 database loader and XML exporter."""
 
 import logging
+import xml.etree.ElementTree as ET
 from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
+from urllib.parse import quote
 
-from dj_playlist_optimizer.models import Track
+from dj_playlist_optimizer.models import PlaylistResult, Track
 
 try:
     from pyrekordbox import Rekordbox6Database
@@ -215,6 +219,10 @@ class RekordboxLoader:
                 artist = content.Artist.Name if content.Artist else "Unknown"
                 track_id = f"{artist} - {title}"
 
+                # Try to get path - usually FolderPath in DB
+                path = getattr(content, "FolderPath", None)
+                rb_id = getattr(content, "ID", None)
+
                 bpm_raw = content.BPM or 0
                 bpm_val = bpm_raw / 100.0 if bpm_raw > 200 else float(bpm_raw)
 
@@ -237,6 +245,10 @@ class RekordboxLoader:
                         bpm=bpm_val,
                         energy=int(content.Rating or 0),
                         duration=float(content.Length or 0),
+                        path=path,
+                        title=title,
+                        artist=artist,
+                        rekordbox_id=rb_id,
                     )
                 )
             except Exception as e:
@@ -244,3 +256,131 @@ class RekordboxLoader:
                 continue
 
         return tracks
+
+    def write_playlist_to_db(self, result: PlaylistResult, name: str):
+        """Write the optimized playlist directly to the Rekordbox database."""
+        if not self.db:
+            raise RuntimeError("Database not initialized")
+
+        logger.info(f"Creating playlist '{name}' in Rekordbox database...")
+
+        # 1. Create playlist
+        try:
+            # We create in root for simplicity
+            # Note: create_playlist returns the new playlist object or ID
+            new_pl = self.db.create_playlist(name)
+
+            # If it returns ID/object, we use it.
+            # Pyrekordbox documentation suggests it returns the object.
+        except Exception as e:
+            raise RuntimeError(f"Failed to create playlist '{name}': {e}") from e
+
+        # 2. Add tracks
+        success_count = 0
+        for track in result.playlist:
+            if not track.rekordbox_id:
+                logger.warning(f"Track '{track.id}' has no Rekordbox ID, skipping add to DB.")
+                continue
+
+            try:
+                # We need to find the content object again or use ID if supported
+                # get_content lookup might be needed if add_to_playlist expects object
+                content = self.db.get_content(ID=track.rekordbox_id)
+                if content:
+                    self.db.add_to_playlist(new_pl, content)
+                    success_count += 1
+                else:
+                    logger.warning(f"Content ID {track.rekordbox_id} not found in DB")
+            except Exception as e:
+                logger.warning(f"Failed to add track {track.id}: {e}")
+
+        # 3. Commit
+        try:
+            self.db.commit()
+            logger.info(f"Successfully created playlist '{name}' with {success_count} tracks.")
+        except Exception as e:
+            raise RuntimeError(f"Failed to commit changes to database: {e}") from e
+
+
+def write_rekordbox_xml(result: PlaylistResult, source_playlist_name: str, output_path: Path):
+    """
+    Write optimization result to a Rekordbox-compatible XML file.
+
+    The output filename is based on the source playlist name + timestamp,
+    unless output_path is explicitly provided with a full path.
+    """
+
+    # Create root
+    root = ET.Element("DJ_PLAYLISTS", Version="1.0.0")
+    ET.SubElement(root, "PRODUCT", Name="rekordbox", Version="6.0.0", Company="AlphaTheta")
+
+    # COLLECTION
+    collection = ET.SubElement(root, "COLLECTION", Entries=str(len(result.playlist)))
+
+    track_id_map = {}
+
+    for i, track in enumerate(result.playlist, 1):
+        # We need a numeric TrackID for internal reference in XML
+        # We'll just use the index for simplicity
+        track_ref_id = str(i)
+        track_id_map[track.id] = track_ref_id
+
+        # Prepare location - Rekordbox expects file:// URL format or absolute path
+        # Usually it is file://localhost/path...
+        # We will try to preserve what we got or standard format
+        location = track.path if track.path else ""
+        if location and not location.startswith("file://"):
+            # Ensure it's properly quoted for URL
+            # basic encoding
+            path_part = quote(location)
+            location = f"file://localhost{path_part}"
+
+        track_elem = ET.SubElement(
+            collection,
+            "TRACK",
+            TrackID=track_ref_id,
+            Name=track.title or "Unknown",
+            Artist=track.artist or "Unknown",
+            Kind="Music",
+            TotalTime=str(int(track.duration)),
+            AverageBpm=str(track.bpm),
+            Tonality=track.key,
+            Rating=str(track.energy),
+        )
+        if location:
+            track_elem.set("Location", location)
+
+    # PLAYLISTS
+    playlists_node = ET.SubElement(root, "PLAYLISTS")
+    root_node = ET.SubElement(playlists_node, "NODE", Type="0", Name="ROOT", Count="1")
+
+    # Generate playlist name
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    playlist_name = f"{source_playlist_name}_{timestamp}"
+
+    playlist_node = ET.SubElement(
+        root_node,
+        "NODE",
+        Name=playlist_name,
+        Type="1",
+        KeyType="0",
+        Entries=str(len(result.playlist)),
+    )
+
+    for track in result.playlist:
+        ref_id = track_id_map.get(track.id)
+        if ref_id:
+            ET.SubElement(playlist_node, "TRACK", Key=ref_id)
+
+    # Write to file
+    tree = ET.ElementTree(root)
+    ET.indent(tree, space="  ", level=0)
+
+    try:
+        with open(output_path, "wb") as f:
+            f.write(b'<?xml version="1.0" encoding="UTF-8"?>\n')
+            tree.write(f, encoding="utf-8", xml_declaration=False)
+        logger.info(f"Rekordbox XML exported to {output_path}")
+    except Exception as e:
+        logger.error(f"Failed to write Rekordbox XML: {e}")
+        raise

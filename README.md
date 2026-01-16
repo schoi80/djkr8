@@ -9,6 +9,7 @@ Optimize DJ playlists for harmonic mixing using Google OR-Tools constraint progr
 - 🎧 **Rekordbox Integration**: Read playlists directly from your local Rekordbox 6/7 database (tested with v7.2.8)
 - 🔊 **BPM Matching**: Supports direct, halftime, and doubletime BPM compatibility
 - ⚙️ **Configurable Strictness**: STRICT, MODERATE, or RELAXED harmonic compatibility levels
+- 📤 **Rekordbox Export**: Export results to Rekordbox XML or write directly to the Rekordbox database
 - 🚀 **Fast**: Powered by Google OR-Tools CP-SAT solver (award-winning constraint solver)
 - 📦 **SDK + CLI**: Use as a Python library or command-line tool
 
@@ -65,12 +66,43 @@ dj-optimize tracks.json --output result.json
 # Use with Rekordbox (v6/v7)
 dj-optimize --rekordbox                                      # List playlists
 dj-optimize --rekordbox --playlist "Techno"                  # Optimize specific playlist
-dj-optimize --rekordbox --playlist "Techno" --output r.json  # Save to file
+dj-optimize --rekordbox --playlist "Techno" --output r.xml   # Export to Rekordbox XML
+dj-optimize --rekordbox --playlist "Techno" --write-to-db    # Write directly to Rekordbox DB
 
 # Enable verbose logging
 dj-optimize tracks.json -v          # INFO level
 dj-optimize tracks.json -vv         # DEBUG level
 ```
+
+## Rekordbox Integration
+
+The tool provides two ways to save your optimized playlists back to Rekordbox:
+
+### 1. XML Export (Recommended)
+
+Export the results to an XML file that can be imported into Rekordbox:
+
+```bash
+dj-optimize --rekordbox --playlist "My Playlist" --output optimized.xml
+```
+
+In Rekordbox:
+1. Go to **File > Import > Import Playlist**
+2. Select `optimized.xml`
+3. The playlist will appear in the `ROOT` folder (e.g., `My Playlist_20260115_120000`)
+
+### 2. Direct Database Write (Advanced)
+
+Write the optimized playlist directly to your Rekordbox 6 database:
+
+```bash
+dj-optimize --rekordbox --playlist "My Playlist" --write-to-db
+```
+
+**⚠️ WARNING:**
+- **Close Rekordbox** before running this command.
+- This modifies your `master.db` file directly.
+- **Backup your database** before using this feature.
 
 ## Input Format
 

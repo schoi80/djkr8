@@ -4,6 +4,7 @@ import argparse
 import json
 import logging
 import sys
+from datetime import datetime
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
@@ -12,7 +13,7 @@ from dj_playlist_optimizer import (
     PlaylistOptimizer,
     Track,
 )
-from dj_playlist_optimizer.rekordbox import HAS_PYREKORDBOX, RekordboxLoader
+from dj_playlist_optimizer.rekordbox import HAS_PYREKORDBOX, RekordboxLoader, write_rekordbox_xml
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +46,9 @@ def load_tracks_from_json(filepath: Path) -> list[Track]:
                 bpm=float(item["bpm"]),
                 energy=int(item.get("energy", 5)),
                 duration=float(item.get("duration", 0.0)),
+                path=item.get("path"),
+                title=item.get("title"),
+                artist=item.get("artist"),
             )
         )
 
@@ -118,7 +122,7 @@ Examples:
         "--output",
         "-o",
         type=Path,
-        help="Output JSON file for results (default: print to stdout)",
+        help="Output JSON file for results (default: print to stdout). Use .xml extension for Rekordbox format.",
     )
 
     parser.add_argument(
@@ -187,6 +191,11 @@ Examples:
         type=str,
         help="Name of Rekordbox playlist to optimize",
     )
+    rb_group.add_argument(
+        "--write-to-db",
+        action="store_true",
+        help="DANGER: Write optimized playlist directly to Rekordbox DB (Rekordbox must be closed!)",
+    )
 
     # New arguments
     parser.add_argument(
@@ -247,7 +256,8 @@ Examples:
         format="%(levelname)s: %(message)s",
     )
 
-    if args.rekordbox:
+    loader = None
+    if args.rekordbox or args.write_to_db:
         if not HAS_PYREKORDBOX:
             logger.error(
                 "pyrekordbox is not installed. Please install it with 'pip install pyrekordbox'"
@@ -262,6 +272,7 @@ Examples:
             print(f"Error: {e}", file=sys.stderr)
             return 1
 
+    if args.rekordbox:
         if not args.playlist:
             print("Fetching playlists from Rekordbox database...")
             try:
@@ -352,10 +363,42 @@ Examples:
         avg_energy = sum(t.energy for t in result.playlist) / len(result.playlist)
         print(f"  Average Energy: {avg_energy:.1f}")
 
+    # Generate playlist name for DB or XML
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    source_name = args.playlist if args.rekordbox and args.playlist else "Optimized"
+    playlist_name = f"{source_name}_{timestamp}"
+
+    # Write to DB if requested
+    if args.write_to_db:
+        if not args.rekordbox:
+            print(
+                "\nWarning: --write-to-db used without --rekordbox. Only tracks with known Rekordbox IDs will be added."
+            )
+
+        print(f"\nWriting to Rekordbox database (playlist: {playlist_name})...")
+        print("WARNING: Ensure Rekordbox is CLOSED to avoid database corruption!")
+        try:
+            loader.write_playlist_to_db(result, playlist_name)
+            print("✓ Successfully wrote playlist to database")
+        except Exception as e:
+            logger.error(f"Failed to write to DB: {e}")
+            print(f"Error writing to database: {e}", file=sys.stderr)
+            return 1
+
+    # Output file handling
     if args.output:
-        save_result_to_json(result, args.output)
-        print(f"\nResults saved to {args.output}")
-    else:
+        if args.output.suffix.lower() == ".xml":
+            try:
+                write_rekordbox_xml(result, source_name, args.output)
+                print(f"\nResults exported to Rekordbox XML: {args.output}")
+            except Exception as e:
+                logger.error(f"Failed to export to Rekordbox XML: {e}")
+                print(f"Error exporting to XML: {e}", file=sys.stderr)
+                return 1
+        else:
+            save_result_to_json(result, args.output)
+            print(f"\nResults saved to {args.output}")
+    elif not args.write_to_db:
         print("\nPlaylist order:")
         for i, track in enumerate(result.playlist, 1):
             print(

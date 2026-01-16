@@ -27,6 +27,10 @@ class Track:
     bpm: float
     energy: int = 5
     duration: float = 0.0
+    path: str | None = None
+    title: str | None = None
+    artist: str | None = None
+    rekordbox_id: int | None = None
 
     def __post_init__(self):
         """Validate track data."""
