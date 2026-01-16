@@ -139,11 +139,19 @@ class PlaylistOptimizer:
         # 1. Edges between real tracks
         for i in range(num_tracks):
             for j in range(num_tracks):
-                if i != j and bpm_compatible(
-                    tracks[i].bpm,
-                    tracks[j].bpm,
-                    self.bpm_tolerance,
-                    self.allow_halftime_bpm,
+                # Constraints:
+                # 1. Different tracks
+                # 2. BPM compatible
+                # 3. Energy must be non-decreasing (next >= current)
+                if (
+                    i != j
+                    and bpm_compatible(
+                        tracks[i].bpm,
+                        tracks[j].bpm,
+                        self.bpm_tolerance,
+                        self.allow_halftime_bpm,
+                    )
+                    and tracks[j].energy >= tracks[i].energy
                 ):
                     edge_vars[(i, j)] = model.new_bool_var(f"edge_{i}_{j}")
 
