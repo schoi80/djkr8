@@ -1,6 +1,6 @@
 [project]
 name = "dj-playlist-optimizer"
-version = "0.1.0"
+version = "1.0.0"
 description = "DJ playlist optimizer using Google OR-Tools for harmonic mixing and BPM matching"
 readme = "README.md"
 authors = [
