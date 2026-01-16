@@ -2,7 +2,7 @@
 
 import logging
 
-from dj_playlist_optimizer.models import HarmonicLevel
+from krate.models import HarmonicLevel
 
 logger = logging.getLogger(__name__)
 

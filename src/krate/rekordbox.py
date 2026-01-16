@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from urllib.parse import quote
 
-from dj_playlist_optimizer.models import PlaylistResult, Track
+from krate.models import PlaylistResult, Track
 
 try:
     from pyrekordbox import Rekordbox6Database

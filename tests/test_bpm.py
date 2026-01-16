@@ -1,6 +1,6 @@
 """Tests for BPM compatibility with halftime/doubletime support."""
 
-from dj_playlist_optimizer.bpm import bpm_compatible, get_bpm_difference
+from krate.bpm import bpm_compatible, get_bpm_difference
 
 
 class TestBpmCompatible:

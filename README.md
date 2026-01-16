@@ -1,6 +1,6 @@
-# 🎧 DJ Playlist Optimizer
+# 🎧 krate - Playlist Optimizer for rekordbox
 
-Optimize DJ playlists for harmonic mixing using Google OR-Tools constraint programming.
+Optimize [rekordbox](https://rekordbox.com) playlists for harmonic mixing using [Google OR-Tools](https://developers.google.com/optimization) constraint programming.
 
 ## Features
 
@@ -17,13 +17,13 @@ Optimize DJ playlists for harmonic mixing using Google OR-Tools constraint progr
 ## Installation
 
 ```bash
-uv add dj-playlist-optimizer
+uv add krate
 ```
 
 Or with pip:
 
 ```bash
-pip install dj-playlist-optimizer
+pip install krate
 ```
 
 ## Quick Start
@@ -31,7 +31,7 @@ pip install dj-playlist-optimizer
 ### SDK Usage
 
 ```python
-from dj_playlist_optimizer import PlaylistOptimizer, Track, HarmonicLevel
+from krate import PlaylistOptimizer, Track, HarmonicLevel
 
 tracks = [
     Track(id="track_001", key="8A", bpm=128),
@@ -56,27 +56,27 @@ for i, track in enumerate(result.playlist, 1):
 
 ```bash
 # Basic usage
-dj-optimize tracks.json
+krate tracks.json
 
 # With custom settings
-dj-optimize tracks.json --bpm-tolerance 8 --harmonic-level moderate
+krate tracks.json --bpm-tolerance 8 --harmonic-level moderate
 
 # Energy flow management
-dj-optimize tracks.json --energy-weight 5.0      # Prioritize higher energy tracks
-dj-optimize tracks.json --allow-energy-drops    # Disable strict non-decreasing energy constraint
+krate tracks.json --energy-weight 5.0      # Prioritize higher energy tracks
+krate tracks.json --allow-energy-drops    # Disable strict non-decreasing energy constraint
 
 # Save results to JSON
-dj-optimize tracks.json --output result.json
+krate tracks.json --output result.json
 
 # Use with Rekordbox (v6/v7)
-dj-optimize --rekordbox                                      # List playlists
-dj-optimize --rekordbox --playlist "Techno"                  # Optimize specific playlist
-dj-optimize --rekordbox --playlist "Techno" --output r.xml   # Export to Rekordbox XML
-dj-optimize --rekordbox --playlist "Techno" --write-to-db    # Write directly to Rekordbox DB
+krate --rekordbox                                      # List playlists
+krate --rekordbox --playlist "Techno"                  # Optimize specific playlist
+krate --rekordbox --playlist "Techno" --output r.xml   # Export to Rekordbox XML
+krate --rekordbox --playlist "Techno" --write-to-db    # Write directly to Rekordbox DB
 
 # Enable verbose logging
-dj-optimize tracks.json -v          # INFO level
-dj-optimize tracks.json -vv         # DEBUG level
+krate tracks.json -v          # INFO level
+krate tracks.json -vv         # DEBUG level
 ```
 
 ## Rekordbox Integration
@@ -88,7 +88,7 @@ The tool provides two ways to save your optimized playlists back to Rekordbox:
 Export the results to an XML file that can be imported into Rekordbox:
 
 ```bash
-dj-optimize --rekordbox --playlist "My Playlist" --output optimized.xml
+krate --rekordbox --playlist "My Playlist" --output optimized.xml
 ```
 
 In Rekordbox:
@@ -101,7 +101,7 @@ In Rekordbox:
 Write the optimized playlist directly to your Rekordbox 6 database:
 
 ```bash
-dj-optimize --rekordbox --playlist "My Playlist" --write-to-db
+krate --rekordbox --playlist "My Playlist" --write-to-db
 ```
 
 **⚠️ WARNING:**
@@ -177,8 +177,8 @@ See `examples/` directory:
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/dj-playlist-optimizer
-cd dj-playlist-optimizer
+git clone https://github.com/yourusername/krate
+cd krate
 
 # Install with dev dependencies
 uv sync --dev

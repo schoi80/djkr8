@@ -1,6 +1,6 @@
 """Integration tests for the playlist optimizer."""
 
-from dj_playlist_optimizer import (
+from krate import (
     HarmonicLevel,
     PlaylistOptimizer,
     Track,

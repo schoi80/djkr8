@@ -1,5 +1,5 @@
-from dj_playlist_optimizer.models import HarmonicLevel, Track
-from dj_playlist_optimizer.optimizer import PlaylistOptimizer
+from krate.models import HarmonicLevel, Track
+from krate.optimizer import PlaylistOptimizer
 
 
 class TestOptimizerFeatures:

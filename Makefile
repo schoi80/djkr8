@@ -26,7 +26,7 @@ install:
 	uv run pre-commit install --hook-type commit-msg
 
 test:
-	uv run python -m pytest --cov=src/dj_playlist_optimizer
+	uv run python -m pytest --cov=src/krate
 
 lint:
 	uv run ruff check --fix

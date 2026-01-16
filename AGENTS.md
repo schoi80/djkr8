@@ -10,7 +10,7 @@ Python library + CLI for optimizing DJ playlists using Google OR-Tools CP-SAT so
 ## STRUCTURE
 ```
 .
-├── src/dj_playlist_optimizer/   # Core logic (solver, models, integrations)
+├── src/krate/   # Core logic (solver, models, integrations)
 ├── tests/                       # Unit + integration tests (pure pytest, no fixtures)
 ├── examples/                    # Usage demos (SDK + logging)
 └── pyproject.toml               # uv-managed dependencies + tool config
@@ -19,12 +19,12 @@ Python library + CLI for optimizing DJ playlists using Google OR-Tools CP-SAT so
 ## WHERE TO LOOK
 | Task | Location | Notes |
 |------|----------|-------|
-| **Core Solver** | `src/dj_playlist_optimizer/optimizer.py` | Uses `AddCircuit` constraint for TSP-like pathfinding |
-| **Data Models** | `src/dj_playlist_optimizer/models.py` | `Track`, `PlaylistResult`, `HarmonicLevel` |
-| **BPM Logic** | `src/dj_playlist_optimizer/bpm.py` | Pure functions for BPM compatibility |
-| **Harmonic Rules** | `src/dj_playlist_optimizer/camelot.py` | Camelot Wheel math + `KEY_MAPPING` |
-| **Rekordbox** | `src/dj_playlist_optimizer/rekordbox.py` | Direct DB read/write + XML export |
-| **CLI** | `src/dj_playlist_optimizer/cli.py` | `argparse` entry point + logging setup |
+| **Core Solver** | `src/krate/optimizer.py` | Uses `AddCircuit` constraint for TSP-like pathfinding |
+| **Data Models** | `src/krate/models.py` | `Track`, `PlaylistResult`, `HarmonicLevel` |
+| **BPM Logic** | `src/krate/bpm.py` | Pure functions for BPM compatibility |
+| **Harmonic Rules** | `src/krate/camelot.py` | Camelot Wheel math + `KEY_MAPPING` |
+| **Rekordbox** | `src/krate/rekordbox.py` | Direct DB read/write + XML export |
+| **CLI** | `src/krate/cli.py` | `argparse` entry point + logging setup |
 
 ## CODE MAP
 | Symbol | Type | Location | Role |
@@ -69,9 +69,9 @@ uv run ruff check --fix && uv run ruff format
 uv run pre-commit run --all-files
 
 # CLI Usage
-uv run dj-optimize tracks.json --harmonic-level moderate
-uv run dj-optimize --rekordbox --playlist "Techno" --output result.xml
-uv run dj-optimize --rekordbox --playlist "Techno" --write-to-db
+uv run krate tracks.json --harmonic-level moderate
+uv run krate --rekordbox --playlist "Techno" --output result.xml
+uv run krate --rekordbox --playlist "Techno" --write-to-db
 ```
 
 ## NOTES

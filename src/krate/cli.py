@@ -8,12 +8,12 @@ from datetime import datetime
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
-from dj_playlist_optimizer import (
+from krate import (
     HarmonicLevel,
     PlaylistOptimizer,
     Track,
 )
-from dj_playlist_optimizer.rekordbox import HAS_PYREKORDBOX, RekordboxLoader, write_rekordbox_xml
+from krate.rekordbox import HAS_PYREKORDBOX, RekordboxLoader, write_rekordbox_xml
 
 logger = logging.getLogger(__name__)
 
@@ -242,7 +242,7 @@ Examples:
     )
 
     try:
-        __version__ = version("dj-playlist-optimizer")
+        __version__ = version("krate")
     except PackageNotFoundError:
         __version__ = "0.0.0"
 

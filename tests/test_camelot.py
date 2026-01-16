@@ -2,13 +2,13 @@
 
 import pytest
 
-from dj_playlist_optimizer.camelot import (
+from krate.camelot import (
     get_compatible_keys,
     get_hour_distance,
     is_harmonic_compatible,
     parse_camelot_key,
 )
-from dj_playlist_optimizer.models import HarmonicLevel
+from krate.models import HarmonicLevel
 
 
 class TestParseCamelotKey:

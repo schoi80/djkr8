@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from dj_playlist_optimizer import PlaylistResult, PlaylistStatistics, Track, cli
+from krate import PlaylistResult, PlaylistStatistics, Track, cli
 
 
 @pytest.fixture
@@ -24,7 +24,7 @@ def mock_tracks_json(tmp_path):
 
 @pytest.fixture
 def mock_optimizer():
-    with patch("dj_playlist_optimizer.cli.PlaylistOptimizer") as mock_opt:
+    with patch("krate.cli.PlaylistOptimizer") as mock_opt:
         instance = mock_opt.return_value
         # Default successful result
         instance.optimize.return_value = PlaylistResult(
@@ -113,8 +113,8 @@ class TestCLI:
 
     def test_main_rekordbox_flow(self, mock_optimizer):
         with (
-            patch("dj_playlist_optimizer.cli.HAS_PYREKORDBOX", True),
-            patch("dj_playlist_optimizer.cli.RekordboxLoader") as mock_loader,
+            patch("krate.cli.HAS_PYREKORDBOX", True),
+            patch("krate.cli.RekordboxLoader") as mock_loader,
         ):
             # Setup loader mock
             pl1 = MagicMock()
@@ -143,8 +143,8 @@ class TestCLI:
 
     def test_main_rekordbox_write_db(self, mock_optimizer):
         with (
-            patch("dj_playlist_optimizer.cli.HAS_PYREKORDBOX", True),
-            patch("dj_playlist_optimizer.cli.RekordboxLoader") as mock_loader,
+            patch("krate.cli.HAS_PYREKORDBOX", True),
+            patch("krate.cli.RekordboxLoader") as mock_loader,
         ):
             loader = mock_loader.return_value
             loader.get_tracks.return_value = [Track(id="t1", key="1A", bpm=120)]
@@ -161,14 +161,14 @@ class TestCLI:
     def test_main_rekordbox_xml_export(self, mock_optimizer, tmp_path):
         out_xml = tmp_path / "out.xml"
         with (
-            patch("dj_playlist_optimizer.cli.HAS_PYREKORDBOX", True),
-            patch("dj_playlist_optimizer.cli.RekordboxLoader") as mock_loader,
+            patch("krate.cli.HAS_PYREKORDBOX", True),
+            patch("krate.cli.RekordboxLoader") as mock_loader,
         ):
             loader = mock_loader.return_value
             loader.get_tracks.return_value = [Track(id="t1", key="1A", bpm=120)]
 
             with (
-                patch("dj_playlist_optimizer.cli.write_rekordbox_xml") as mock_write,
+                patch("krate.cli.write_rekordbox_xml") as mock_write,
                 patch.object(
                     sys,
                     "argv",
@@ -181,7 +181,7 @@ class TestCLI:
 
     def test_main_no_solution(self, mock_tracks_json):
         # Force empty result
-        with patch("dj_playlist_optimizer.cli.PlaylistOptimizer") as mock_opt:
+        with patch("krate.cli.PlaylistOptimizer") as mock_opt:
             instance = mock_opt.return_value
             instance.optimize.return_value = PlaylistResult(playlist=[], solver_status="INFEASIBLE")
 

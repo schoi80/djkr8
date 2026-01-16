@@ -1,6 +1,6 @@
 import pytest
 
-from dj_playlist_optimizer.models import PlaylistStatistics, Track
+from krate.models import PlaylistStatistics, Track
 
 
 class TestModels:

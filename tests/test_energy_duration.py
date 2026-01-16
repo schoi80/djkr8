@@ -1,7 +1,7 @@
 import pytest
 
-from dj_playlist_optimizer.models import Track
-from dj_playlist_optimizer.optimizer import PlaylistOptimizer
+from krate.models import Track
+from krate.optimizer import PlaylistOptimizer
 
 
 class TestEnergyAndDuration:
