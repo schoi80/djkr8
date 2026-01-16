@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.4.0 (2026-01-16)
+
+### Features
+
+- Rebranding to djkr8
+  ([`1788fcd`](https://github.com/schoi80/dj-krate/commit/1788fcd6c94114eb497222b85d8d4d5b22f55d76))
+
+
 ## v1.3.0 (2026-01-16)
 
 ### Chores
