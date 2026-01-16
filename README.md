@@ -6,6 +6,7 @@ Optimize DJ playlists for harmonic mixing using Google OR-Tools constraint progr
 
 - ✨ **Longest Path Optimization**: Finds the maximum number of tracks that can be mixed together
 - 🎵 **Harmonic Mixing**: Uses the Camelot Wheel system for key compatibility
+- 🎧 **Rekordbox Integration**: Read playlists directly from your local Rekordbox 6/7 database (tested with v7.2.8)
 - 🔊 **BPM Matching**: Supports direct, halftime, and doubletime BPM compatibility
 - ⚙️ **Configurable Strictness**: STRICT, MODERATE, or RELAXED harmonic compatibility levels
 - 🚀 **Fast**: Powered by Google OR-Tools CP-SAT solver (award-winning constraint solver)
@@ -60,6 +61,11 @@ dj-optimize tracks.json --bpm-tolerance 8 --harmonic-level moderate
 
 # Save results to JSON
 dj-optimize tracks.json --output result.json
+
+# Use with Rekordbox (v6/v7)
+dj-optimize --rekordbox                                      # List playlists
+dj-optimize --rekordbox --playlist "Techno"                  # Optimize specific playlist
+dj-optimize --rekordbox --playlist "Techno" --output r.json  # Save to file
 
 # Enable verbose logging
 dj-optimize tracks.json -v          # INFO level
@@ -233,4 +239,5 @@ MIT
 
 Built with:
 - [Google OR-Tools](https://developers.google.com/optimization) - Constraint programming solver
+- [pyrekordbox](https://github.com/dylanljones/pyrekordbox) - Rekordbox database access
 - Camelot Wheel system by Mark Davis (Mixed In Key)

@@ -12,6 +12,7 @@ from dj_playlist_optimizer import (
     PlaylistOptimizer,
     Track,
 )
+from dj_playlist_optimizer.rekordbox import HAS_PYREKORDBOX, RekordboxLoader
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +110,7 @@ Examples:
     parser.add_argument(
         "input",
         type=Path,
+        nargs="?",
         help="Input JSON file with tracks (format: {tracks: [{id, key, bpm}, ...]})",
     )
 
@@ -174,6 +176,18 @@ Examples:
         help="Weight for energy level optimization (default: 0.0)",
     )
 
+    rb_group = parser.add_argument_group("Rekordbox Options")
+    rb_group.add_argument(
+        "--rekordbox",
+        action="store_true",
+        help="Use Rekordbox database as input source",
+    )
+    rb_group.add_argument(
+        "--playlist",
+        type=str,
+        help="Name of Rekordbox playlist to optimize",
+    )
+
     # New arguments
     parser.add_argument(
         "--start",
@@ -233,14 +247,61 @@ Examples:
         format="%(levelname)s: %(message)s",
     )
 
-    try:
-        tracks = load_tracks_from_json(args.input)
-    except Exception as e:
-        logger.error(f"Failed to load tracks: {e}")
-        print(f"Error loading tracks: {e}", file=sys.stderr)
-        return 1
+    if args.rekordbox:
+        if not HAS_PYREKORDBOX:
+            logger.error(
+                "pyrekordbox is not installed. Please install it with 'pip install pyrekordbox'"
+            )
+            print("Error: pyrekordbox is not installed.", file=sys.stderr)
+            return 1
 
-    print(f"Loaded {len(tracks)} tracks from {args.input}")
+        try:
+            loader = RekordboxLoader()
+        except Exception as e:
+            logger.error(f"Failed to initialize Rekordbox loader: {e}")
+            print(f"Error: {e}", file=sys.stderr)
+            return 1
+
+        if not args.playlist:
+            print("Fetching playlists from Rekordbox database...")
+            try:
+                playlists = loader.list_playlists()
+                if not playlists:
+                    print("No playlists found.")
+                    return 0
+
+                print(f"\nAvailable Playlists ({len(playlists)}):")
+                print("-" * 50)
+                print(f"{'Name':<35} | {'Tracks':>6}")
+                print("-" * 50)
+                for pl in sorted(playlists, key=lambda x: x.name):
+                    print(f"{pl.name:<35} | {pl.count:>6}")
+                print("-" * 50)
+                print("\nUse --playlist 'Name' to optimize a specific playlist.")
+                return 0
+            except Exception as e:
+                logger.error(f"Failed to list playlists: {e}")
+                print(f"Error listing playlists: {e}", file=sys.stderr)
+                return 1
+
+        try:
+            tracks = loader.get_tracks(args.playlist)
+            print(f"Loaded {len(tracks)} tracks from playlist '{args.playlist}'")
+        except Exception as e:
+            logger.error(f"Failed to load playlist '{args.playlist}': {e}")
+            print(f"Error loading playlist: {e}", file=sys.stderr)
+            return 1
+
+    elif args.input:
+        try:
+            tracks = load_tracks_from_json(args.input)
+            print(f"Loaded {len(tracks)} tracks from {args.input}")
+        except Exception as e:
+            logger.error(f"Failed to load tracks: {e}")
+            print(f"Error loading tracks: {e}", file=sys.stderr)
+            return 1
+    else:
+        parser.error("Either input file or --rekordbox must be specified")
 
     harmonic_level_map = {
         "strict": HarmonicLevel.STRICT,
