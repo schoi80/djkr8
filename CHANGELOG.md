@@ -2,6 +2,17 @@
 
 <!-- version list -->
 
+## v1.2.0 (2026-01-16)
+
+### Features
+
+- Enforce energy range (1-5) and non-decreasing flow constraint
+  ([`3346e7b`](https://github.com/schoi80/dj-playlist-optimizer/commit/3346e7b45166c098d10bbcf2b31dd5e1a62a9fe6))
+
+- Make energy flow constraint togglable and update documentation
+  ([`a1a9f5b`](https://github.com/schoi80/dj-playlist-optimizer/commit/a1a9f5b3b1d135f7a1f6af571ef10b94c7e87521))
+
+
 ## v1.1.0 (2026-01-16)
 
 ### Documentation
