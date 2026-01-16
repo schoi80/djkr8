@@ -1,0 +1,30 @@
+[project]
+name = "dj-playlist-optimizer"
+version = "0.1.0"
+description = "DJ playlist optimizer using Google OR-Tools for harmonic mixing and BPM matching"
+readme = "README.md"
+authors = [
+    { name = "Sage Choi", email = "sage.choi@gmail.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "ortools>=9.8.3296",
+]
+
+[project.scripts]
+dj-optimize = "dj_playlist_optimizer.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.9.21,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
