@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.3.0 (2026-01-16)
+
+### Chores
+
+- Renamed to krate
+  ([`158a8a6`](https://github.com/schoi80/krate/commit/158a8a63fcc952865724fd7ca8030aee73e82a12))
+
+### Features
+
+- Rebranded to krate
+  ([`4774480`](https://github.com/schoi80/krate/commit/47744803ccf3a06fbe9b1fc0c762cdac75ed8953))
+
+
 ## v1.2.0 (2026-01-16)
 
 ### Features
