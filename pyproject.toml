@@ -1,6 +1,6 @@
 [project]
 name = "djkr8"
-version = "1.4.0"
+version = "1.5.0"
 description = "DJ playlist optimizer using Google OR-Tools for harmonic mixing and BPM matching"
 readme = "README.md"
 license = { file = "LICENSE" }

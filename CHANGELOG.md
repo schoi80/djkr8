@@ -2,6 +2,27 @@
 
 <!-- version list -->
 
+## v1.5.0 (2026-01-17)
+
+### Bug Fixes
+
+- Resolve pre-commit linting issues
+  ([`74904f2`](https://github.com/schoi80/djkr8/commit/74904f2ec7634b12d9e932e1804b47b17e122809))
+
+### Documentation
+
+- Updated project detail
+  ([`0c7026c`](https://github.com/schoi80/djkr8/commit/0c7026c5a7410b5791e02775c24d7dd810ba3bec))
+
+### Features
+
+- Add harmonic mixing philosophies from Mixed In Key
+  ([`4c78565`](https://github.com/schoi80/djkr8/commit/4c78565fbbaf44bfc7bde1cb8e16b86bf0a4c035))
+
+- Add max +1 energy increase constraint when flow is enforced
+  ([`47924bb`](https://github.com/schoi80/djkr8/commit/47924bbf2f2c29eb6eb6caa429a0a2cd99ca1b4a))
+
+
 ## v1.4.0 (2026-01-16)
 
 ### Features
