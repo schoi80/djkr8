@@ -7,6 +7,8 @@ Optimize [rekordbox](https://rekordbox.com) playlists for harmonic mixing using 
 - ✨ **Longest Path Optimization**: Finds the maximum number of tracks that can be mixed together
 - ⚡ **Energy Flow Management**: Enforces non-decreasing energy progression with max +1 increase per transition (1-5 range)
 - 🎵 **Harmonic Mixing**: Uses the Camelot Wheel system for key compatibility
+- 🚀 **Energy Boost Transitions**: Strategic +2 hour jumps (5A→7A) for crowd excitement, used sparingly (max 3 per set)
+- 📊 **Transition Quality Scoring**: Intelligently weights transitions by harmonic quality (1.0 = perfect, 0.6 = energy boost)
 - 🎧 **Rekordbox Integration**: Read playlists directly from your local Rekordbox 6/7 database (tested with v7.2.8)
 - 🔊 **BPM Matching**: Supports direct, halftime, and doubletime BPM compatibility
 - ⚙️ **Configurable Strictness**: STRICT, MODERATE, or RELAXED harmonic compatibility levels
@@ -153,7 +155,12 @@ Harmonic compatibility levels:
 
 ### 3. Optimization Goal
 
-Maximize playlist length while keeping non-harmonic transitions below the threshold (default: 10%).
+Maximize playlist length while optimizing transition quality and respecting harmonic constraints.
+
+**Multi-Objective Optimization:**
+- Primary: Maximize playlist length (more tracks = better)
+- Secondary: Maximize transition quality scores (smoother mixes = better)
+- Constraints: Energy flow, harmonic violations, energy boosts
 
 ## Configuration Options
 
@@ -164,7 +171,51 @@ Maximize playlist length while keeping non-harmonic transitions below the thresh
 | `max_violation_pct` | 0.10 | Max percentage of non-harmonic transitions |
 | `harmonic_level` | STRICT | Harmonic compatibility strictness |
 | `enforce_energy_flow` | True | Enforce non-decreasing energy with max +1 increase (`next >= current` and `next - current <= 1`) |
+| `max_energy_boosts` | 3 | Maximum number of energy boost transitions (+2 hours on Camelot wheel) per playlist |
+| `transition_quality_weight` | 10.0 | Weight for transition quality in objective function (higher = prefer quality over length) |
 | `time_limit_seconds` | 60.0 | Solver time limit |
+
+## Advanced Features
+
+### Energy Boost Mixing
+
+Based on [Mixed In Key's Energy Boost technique](https://mixedinkey.com/harmonic-mixing-guide/energy-boost-dj-mixing-tutorial/), you can use strategic harmonic jumps to add excitement:
+
+**+2 Hours (Energy Boost)**: Jump forward 2 hours on the Camelot wheel
+```python
+# Example: 5A → 7A
+# Gives a quick burst of energy to wake up the dancefloor
+optimizer = PlaylistOptimizer(max_energy_boosts=3)  # Allow up to 3 boosts
+```
+
+**-5 Hours (Armin Variation)**: Jump backward 5 hours
+```python
+# Example: 12A → 7A  
+# Used by Armin Van Buuren and Skrillex for dramatic energy spikes
+```
+
+**Best Practices** (from professional DJ analysis):
+- Use energy boosts **sparingly** (every 20-30 minutes, not constantly)
+- Top DJs average 2-3 energy boosts per set
+- Combine with energy level increases for maximum impact
+- Default limit: `max_energy_boosts=3` per playlist
+
+### Transition Quality Scoring
+
+The optimizer now scores each transition by harmonic quality:
+
+| Transition Type | Quality Score | Example |
+|----------------|---------------|---------|
+| Perfect match (same key) | 1.0 | 8A → 8A |
+| ±1 hour, same letter | 0.95 | 8A → 9A |
+| Relative major/minor | 0.9 | 8A → 8B |
+| ±1 hour, different letter | 0.8 | 8A → 9B |
+| **Energy Boost (+2)** | **0.6** | **5A → 7A** |
+| **Armin Variation (-5)** | **0.5** | **12A → 7A** |
+| Mood shift (±3 hours) | 0.4 | 8A → 5A |
+| Clash | 0.0 | 8A → 2B |
+
+**Quality scores are weighted** in the objective function, so the solver prefers smoother transitions when possible.
 
 ## Examples
 

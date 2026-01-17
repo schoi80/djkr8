@@ -4,6 +4,20 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 
+class TransitionType(str, Enum):
+    SMOOTH = "smooth"
+    ENERGY_BOOST = "energy_boost"
+    VIOLATION = "violation"
+
+
+class SetArcProfile(str, Enum):
+    NONE = "none"
+    WARMUP_PEAK_COOLDOWN = "warmup_peak_cooldown"
+    FESTIVAL_MAINSTAGE = "festival_mainstage"
+    PROGRESSIVE_BUILD = "progressive_build"
+    STEADY_STATE = "steady_state"
+
+
 class HarmonicLevel(str, Enum):
     """
     Defines which harmonic transitions are considered 'safe' (non-violations).
@@ -20,10 +34,8 @@ class HarmonicLevel(str, Enum):
 
 @dataclass
 class Track:
-    """Represents a music track with mixing metadata."""
-
     id: str
-    key: str  # Camelot notation (e.g., "8A", "12B")
+    key: str
     bpm: float
     energy: int = 5
     duration: float = 0.0
@@ -33,12 +45,10 @@ class Track:
     rekordbox_id: int | None = None
 
     def __post_init__(self):
-        """Validate track data."""
         if not self.id:
             raise ValueError("Track id cannot be empty")
         if not isinstance(self.bpm, (int, float)) or self.bpm <= 0:
             raise ValueError(f"Invalid BPM: {self.bpm}")
-        # Basic Camelot key validation
         if not self.key or len(self.key) < 2:
             raise ValueError(f"Invalid Camelot key: {self.key}")
         if not (1 <= self.energy <= 5):
@@ -48,14 +58,22 @@ class Track:
 
 
 @dataclass
-class TransitionInfo:
-    """Information about a transition between two tracks."""
+class EnergyArc:
+    profile: SetArcProfile
+    allow_cooldown_drops: bool = False
+    max_drop_amount: int = 2
+    min_cooldown_duration: int = 2
 
+
+@dataclass
+class TransitionInfo:
     from_track: Track
     to_track: Track
     is_harmonic: bool
     is_bpm_compatible: bool
     bpm_difference: float
+    transition_type: TransitionType = TransitionType.SMOOTH
+    quality_score: float = 1.0
 
 
 @dataclass

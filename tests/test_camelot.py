@@ -144,3 +144,82 @@ class TestGetCompatibleKeys:
         assert "11B" in compatible
         assert "1B" in compatible
         assert "12A" in compatible
+
+
+class TestTransitionQuality:
+    def test_perfect_match_same_key(self):
+        from djkr8.camelot import get_transition_quality
+        from djkr8.models import TransitionType
+
+        quality, trans_type = get_transition_quality("8A", "8A")
+        assert quality == 1.0
+        assert trans_type == TransitionType.SMOOTH
+
+    def test_smooth_plus_one_hour_same_letter(self):
+        from djkr8.camelot import get_transition_quality
+        from djkr8.models import TransitionType
+
+        quality, trans_type = get_transition_quality("8A", "9A")
+        assert quality == 0.95
+        assert trans_type == TransitionType.SMOOTH
+
+    def test_smooth_relative_major_minor(self):
+        from djkr8.camelot import get_transition_quality
+        from djkr8.models import TransitionType
+
+        quality, trans_type = get_transition_quality("8A", "8B")
+        assert quality == 0.9
+        assert trans_type == TransitionType.SMOOTH
+
+    def test_energy_boost_plus_two(self):
+        from djkr8.camelot import get_transition_quality
+        from djkr8.models import TransitionType
+
+        quality, trans_type = get_transition_quality("5A", "7A")
+        assert quality == 0.6
+        assert trans_type == TransitionType.ENERGY_BOOST
+
+    def test_armin_variation_minus_five(self):
+        from djkr8.camelot import get_transition_quality
+        from djkr8.models import TransitionType
+
+        quality, trans_type = get_transition_quality("12A", "7A")
+        assert quality == 0.5
+        assert trans_type == TransitionType.ENERGY_BOOST
+
+    def test_violation_incompatible(self):
+        from djkr8.camelot import get_transition_quality
+        from djkr8.models import TransitionType
+
+        quality, trans_type = get_transition_quality("8A", "2B")
+        assert quality == 0.0
+        assert trans_type == TransitionType.VIOLATION
+
+
+class TestEnergyBoost:
+    def test_plus_two_same_letter_is_boost(self):
+        from djkr8.camelot import is_energy_boost
+
+        assert is_energy_boost("5A", "7A") is True
+        assert is_energy_boost("1B", "3B") is True
+
+    def test_minus_five_armin_variation_is_boost(self):
+        from djkr8.camelot import is_energy_boost
+
+        assert is_energy_boost("12A", "7A") is True
+        assert is_energy_boost("8B", "3B") is True
+
+    def test_plus_one_is_not_boost(self):
+        from djkr8.camelot import is_energy_boost
+
+        assert is_energy_boost("8A", "9A") is False
+
+    def test_same_key_is_not_boost(self):
+        from djkr8.camelot import is_energy_boost
+
+        assert is_energy_boost("8A", "8A") is False
+
+    def test_plus_two_different_letter_is_not_boost(self):
+        from djkr8.camelot import is_energy_boost
+
+        assert is_energy_boost("5A", "7B") is False

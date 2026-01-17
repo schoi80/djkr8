@@ -2,9 +2,62 @@
 
 import logging
 
-from djkr8.models import HarmonicLevel
+from djkr8.models import HarmonicLevel, TransitionType
 
 logger = logging.getLogger(__name__)
+
+
+def get_transition_quality(key1: str, key2: str) -> tuple[float, TransitionType]:
+    try:
+        hour1, letter1 = parse_camelot_key(key1)
+        hour2, letter2 = parse_camelot_key(key2)
+    except ValueError:
+        return (0.0, TransitionType.VIOLATION)
+
+    hour_dist = get_hour_distance(hour1, hour2)
+    same_letter = letter1 == letter2
+
+    if hour_dist == 0 and same_letter:
+        return (1.0, TransitionType.SMOOTH)
+
+    if hour_dist == 1 and same_letter:
+        return (0.95, TransitionType.SMOOTH)
+
+    if hour_dist == 0 and not same_letter:
+        return (0.9, TransitionType.SMOOTH)
+
+    if hour_dist == 1 and not same_letter:
+        return (0.8, TransitionType.SMOOTH)
+
+    if hour_dist == 2 and same_letter:
+        return (0.6, TransitionType.ENERGY_BOOST)
+
+    if hour_dist == 5:
+        return (0.5, TransitionType.ENERGY_BOOST)
+
+    if hour_dist == 3:
+        return (0.4, TransitionType.SMOOTH)
+
+    return (0.0, TransitionType.VIOLATION)
+
+
+def is_energy_boost(key1: str, key2: str) -> bool:
+    try:
+        hour1, letter1 = parse_camelot_key(key1)
+        hour2, letter2 = parse_camelot_key(key2)
+    except ValueError:
+        return False
+
+    hour_dist = get_hour_distance(hour1, hour2)
+    same_letter = letter1 == letter2
+
+    if hour_dist == 2 and same_letter:
+        return True
+
+    if hour_dist == 5:
+        return True
+
+    return False
 
 
 def parse_camelot_key(key: str) -> tuple[int, str]:

@@ -127,7 +127,9 @@ class TestPlaylistOptimizerIntegration:
         assert result.statistics.harmonic_pct == 100.0
 
     def test_violation_threshold(self):
-        optimizer = PlaylistOptimizer(max_violation_pct=0.0, harmonic_level=HarmonicLevel.STRICT)
+        optimizer = PlaylistOptimizer(
+            max_violation_pct=0.0, harmonic_level=HarmonicLevel.STRICT, max_energy_boosts=0
+        )
 
         tracks = [
             Track(id="track_1", key="8A", bpm=128),
