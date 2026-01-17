@@ -190,7 +190,7 @@ optimizer = PlaylistOptimizer(max_energy_boosts=3)  # Allow up to 3 boosts
 
 **-5 Hours (Armin Variation)**: Jump backward 5 hours
 ```python
-# Example: 12A → 7A  
+# Example: 12A → 7A
 # Used by Armin Van Buuren and Skrillex for dramatic energy spikes
 ```
 

@@ -1,4 +1,4 @@
-from djkr8 import PlaylistOptimizer, Track, HarmonicLevel
+from djkr8 import HarmonicLevel, PlaylistOptimizer, Track
 
 print("=" * 70)
 print("Energy Boost Mixing Demo - Mixed In Key Philosophy")
@@ -37,9 +37,17 @@ for i, track in enumerate(result.playlist, 1):
 if result.transitions:
     print("\nTransition Analysis:")
     for i, trans in enumerate(result.transitions, 1):
-        quality_label = "✓ Smooth" if trans.quality_score >= 0.8 else "⚡ Boost" if trans.quality_score >= 0.5 else "⚠ Clash"
-        print(f"  {i}. {trans.from_track.key} → {trans.to_track.key} | "
-              f"Quality: {trans.quality_score:.2f} | {quality_label}")
+        quality_label = (
+            "✓ Smooth"
+            if trans.quality_score >= 0.8
+            else "⚡ Boost"
+            if trans.quality_score >= 0.5
+            else "⚠ Clash"
+        )
+        print(
+            f"  {i}. {trans.from_track.key} → {trans.to_track.key} | "
+            f"Quality: {trans.quality_score:.2f} | {quality_label}"
+        )
 
 print("\n\n⚡ SCENARIO 2: With Energy Boosts (Mixed In Key Style)")
 print("-" * 70)
@@ -69,9 +77,11 @@ if result.transitions:
             quality_label = "✓ Smooth"
         else:
             quality_label = "⚠ Clash"
-        
-        print(f"  {i}. {trans.from_track.key} → {trans.to_track.key} | "
-              f"Quality: {trans.quality_score:.2f} | {quality_label}")
+
+        print(
+            f"  {i}. {trans.from_track.key} → {trans.to_track.key} | "
+            f"Quality: {trans.quality_score:.2f} | {quality_label}"
+        )
 
     print(f"\n💡 Energy Boosts Used: {boost_count}/{optimizer.max_energy_boosts}")
 

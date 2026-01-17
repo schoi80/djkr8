@@ -7,14 +7,12 @@ from ortools.sat.python import cp_model
 from djkr8.bpm import bpm_compatible, get_bpm_difference
 from djkr8.camelot import get_transition_quality, is_energy_boost, is_harmonic_compatible
 from djkr8.models import (
-    EnergyArc,
     HarmonicLevel,
     PlaylistResult,
     PlaylistStatistics,
     SetArcProfile,
     Track,
     TransitionInfo,
-    TransitionType,
 )
 
 logger = logging.getLogger(__name__)
@@ -227,7 +225,7 @@ class PlaylistOptimizer:
             if i == dummy_idx or j == dummy_idx:
                 continue
 
-            quality, transition_type = get_transition_quality(tracks[i].key, tracks[j].key)
+            quality, _ = get_transition_quality(tracks[i].key, tracks[j].key)
             quality_scores[(i, j)] = quality
 
             is_boost = is_energy_boost(tracks[i].key, tracks[j].key)

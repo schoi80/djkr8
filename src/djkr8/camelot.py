@@ -54,10 +54,7 @@ def is_energy_boost(key1: str, key2: str) -> bool:
     if hour_dist == 2 and same_letter:
         return True
 
-    if hour_dist == 5:
-        return True
-
-    return False
+    return hour_dist == 5
 
 
 def parse_camelot_key(key: str) -> tuple[int, str]:
